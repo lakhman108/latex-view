@@ -1,73 +1,83 @@
 .file-tree {
-  width: 200px;
-  min-width: 180px;
-  background: #1e1e2e;
-  border-right: 1px solid #2d2d3f;
+  width: 220px;
+  min-width: 200px;
+  background: var(--bg-panel);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
   overflow: hidden;
   flex-shrink: 0;
+  box-shadow: var(--shadow-md);
 }
 
 .file-tree-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 12px;
-  font-size: 12px;
+  padding: 16px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  color: #888;
-  border-bottom: 1px solid #2d2d3f;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .file-tree-add {
-  background: none;
+  background: transparent;
   border: none;
-  color: #888;
-  font-size: 18px;
+  color: var(--text-muted);
+  font-size: 16px;
   cursor: pointer;
-  padding: 0 4px;
-  line-height: 1;
-  transition: color 0.15s;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
 }
 
 .file-tree-add:hover {
-  color: #1a7f5e;
+  background: var(--bg-surface);
+  color: var(--text-primary);
 }
 
 .file-tree-list {
   list-style: none;
   margin: 0;
-  padding: 8px 0;
+  padding: 12px 8px;
+  overflow-y: auto;
 }
 
 .file-tree-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 7px 12px;
+  gap: 10px;
+  padding: 8px 12px;
   cursor: pointer;
-  color: #ccc;
+  color: var(--text-secondary);
   font-size: 13px;
-  border-left: 3px solid transparent;
-  transition: background 0.1s;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+  margin-bottom: 2px;
 }
 
 .file-tree-item:hover {
-  background: #2a2a3c;
-  color: #fff;
+  background: var(--bg-surface);
+  color: var(--text-primary);
 }
 
 .file-tree-item--active {
-  background: #2a2a3c;
-  color: #fff;
-  border-left-color: #1a7f5e;
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--accent-color);
+  font-weight: 500;
 }
 
 .file-tree-icon {
-  font-size: 14px;
+  font-size: 15px;
+  opacity: 0.9;
+  display: flex;
 }
 
 .file-tree-name {

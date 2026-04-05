@@ -21,7 +21,7 @@ A browser-based LaTeX editor and compiler with an Overleaf-like UI. Write LaTeX 
 ## Requirements
 
 - Node.js 18+
-- `pdflatex` (TeX Live) — install with `sudo apt-get install texlive-latex-base`
+- `pdflatex` (TeX Live) — install with `sudo apt-get install -y texlive-latex-base texlive-latex-extra texlive-fonts-extra`
 
 ## Getting Started
 
@@ -80,7 +80,15 @@ Compiles LaTeX source code and returns a PDF.
 **Response:**
 - `200 OK` — PDF binary (Content-Type: application/pdf)
 - `422 Unprocessable Entity` — Compilation error with log
+- `503 Service Unavailable` — `pdflatex` is not installed on the backend host
 - `400 Bad Request` — Missing or invalid LaTeX source
+
+## Troubleshooting
+
+- Error: `spawnSync pdflatex ENOENT`
+	- Cause: `pdflatex` is not installed or not in `PATH` on the backend host.
+	- Fix (Ubuntu/Debian): `sudo apt-get install -y texlive-latex-base texlive-latex-extra texlive-fonts-extra`
+	- Restart the backend after installation.
 
 ### `GET /api/health`
 

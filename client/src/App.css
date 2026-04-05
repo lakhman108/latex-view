@@ -1,62 +1,77 @@
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-html, body, #root {
-  height: 100%;
-  overflow: hidden;
-}
-
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: #1e1e2e;
-  color: #f0f0f0;
-}
-
 .app {
   display: flex;
   flex-direction: column;
   height: 100vh;
   overflow: hidden;
+  background: var(--bg-app);
 }
 
 .main-layout {
   display: flex;
   flex: 1;
   overflow: hidden;
+  padding: 16px;
+  gap: 16px;
 }
 
 .editor-preview-area {
   display: flex;
   flex: 1;
   overflow: hidden;
+  background: var(--bg-panel);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-color);
+  position: relative;
 }
 
 .editor-pane {
   height: 100%;
   overflow: hidden;
   flex-shrink: 0;
-  background: #1e1e1e;
+  border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+  background: #1e1e1e; /* matches Monaco vs-dark basic bg slightly better but Monaco does its own */
 }
 
 .preview-pane {
   height: 100%;
   overflow: hidden;
   flex-shrink: 0;
+  background: var(--bg-panel);
+  border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
 }
 
 .resize-handle {
-  width: 5px;
+  width: 1px;
   cursor: col-resize;
-  background: #2d2d3f;
+  background: var(--border-color);
   flex-shrink: 0;
-  transition: background 0.15s;
-  user-select: none;
+  position: relative;
+  z-index: 10;
+  transition: background var(--transition-fast);
+}
+
+.resize-handle::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 32px;
+  width: 4px;
+  border-radius: 4px;
+  background: var(--text-muted);
+  opacity: 0;
+  transition: opacity 0.2s, background 0.2s;
 }
 
 .resize-handle:hover,
 .resize-handle:active {
-  background: #1a7f5e;
+  background: var(--accent-hover);
+}
+
+.resize-handle:hover::after,
+.resize-handle:active::after {
+  opacity: 1;
+  background: var(--accent-color);
 }

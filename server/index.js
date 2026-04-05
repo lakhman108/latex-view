@@ -10,6 +10,23 @@ const rateLimit = require('express-rate-limit');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+function isPdflatexAvailable() {
+  try {
+    execFileSync('pdflatex', ['--version'], { timeout: 5000, stdio: 'ignore' });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+const hasPdflatex = isPdflatexAvailable();
+
+if (!hasPdflatex) {
+  console.warn(
+      'pdflatex was not found on PATH. Install TeX Live (e.g. apt-get install texlive-latex-base texlive-latex-extra texlive-fonts-extra).'
+  );
+}
+
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 
@@ -30,6 +47,14 @@ app.post('/api/compile', compileLimiter, (req, res) => {
     return res.status(400).json({ error: 'No LaTeX source provided.' });
   }
 
+  if (!hasPdflatex) {
+    return res.status(503).json({
+      error: 'LaTeX compiler is not installed on the server.',
+      details:
+        'Install pdflatex (TeX Live) and restart the server. On Ubuntu: sudo apt-get install texlive-latex-base texlive-latex-extra texlive-fonts-extra',
+    });
+  }
+
   const jobId = uuidv4();
   const workDir = path.join(os.tmpdir(), `latex-${jobId}`);
 
@@ -47,6 +72,14 @@ app.post('/api/compile', compileLimiter, (req, res) => {
         { timeout: 30000, cwd: workDir }
       );
     } catch (compileErr) {
+      if (compileErr?.code === 'ENOENT') {
+        return res.status(503).json({
+          error: 'LaTeX compiler executable was not found.',
+          details:
+            'Install pdflatex (TeX Live) and restart the server. On Ubuntu: sudo apt-get install texlive-latex-base texlive-latex-extra texlive-fonts-extra',
+        });
+      }
+
       const logFile = path.join(workDir, 'main.log');
       const logContent = fs.existsSync(logFile)
         ? fs.readFileSync(logFile, 'utf8')
@@ -84,7 +117,7 @@ app.post('/api/compile', compileLimiter, (req, res) => {
 
 // Health check
 app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok' });
+  res.json({ status: 'ok', compiler: hasPdflatex ? 'pdflatex' : 'missing' });
 });
 
 app.listen(PORT, () => {
