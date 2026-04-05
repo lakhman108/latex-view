@@ -1,10 +1,11 @@
 const express = require('express');
 const cors = require('cors');
-const { execSync } = require('child_process');
+const { execFileSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const os = require('os');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -12,8 +13,17 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 
+// Rate limit compilation requests to prevent abuse
+const compileLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 20,             // max 20 requests per minute per IP
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many compilation requests. Please wait a moment and try again.' },
+});
+
 // Compile LaTeX to PDF
-app.post('/api/compile', (req, res) => {
+app.post('/api/compile', compileLimiter, (req, res) => {
   const { latex } = req.body;
 
   if (!latex || typeof latex !== 'string') {
@@ -30,8 +40,10 @@ app.post('/api/compile', (req, res) => {
     fs.writeFileSync(texFile, latex, 'utf8');
 
     try {
-      execSync(
-        `pdflatex -interaction=nonstopmode -output-directory="${workDir}" "${texFile}"`,
+      // Use execFileSync with an arguments array to prevent command injection
+      execFileSync(
+        'pdflatex',
+        ['-interaction=nonstopmode', '-output-directory', workDir, texFile],
         { timeout: 30000, cwd: workDir }
       );
     } catch (compileErr) {
